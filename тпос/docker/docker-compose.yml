@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+  database:
+    image: postgres
+    restart: always
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    networks: 
+      lab_vlan:
+        ipv4_address: 192.168.1.10
+
+  filler:
+    build:
+      context: ./filler
+      args:
+        - DDIR=/data
+        - PORT=5432
+        - IP=192.168.1.10
+    volumes:
+        - /Users/a18289972/Desktop/gevorgjanso-hwdocker/data/:/data
+    depends_on:
+      - database  
+    networks: 
+      lab_vlan:
+        ipv4_address: 192.168.1.11
+
+networks:
+  lab_vlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
+
+
+
